@@ -25,7 +25,7 @@ export default function LeafletMap({coords,children}) {
 	return (
 		<div className="leaflet-map">
 			<MapContainer
-				style={{ height: 450, width: 450 }}
+				style={{ height: 450, width: 600 }}
 				center={[0, 0]}
 				zoom={8}
 				scrollWheelZoom={false}

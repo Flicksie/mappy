@@ -11,19 +11,24 @@ function ReturnMarker(c, text) {
 export function FlyToLocation({ coords }) {
 	const map = useMap();
 	map.flyTo(coords, map.getZoom());
+
 	return ReturnMarker(coords);
 }
 export function PanToLocation({ coords }) {
 	const map = useMap();
 	map.panTo(coords, map.getZoom());
-	return ReturnMarker(coords);
+	return coords === null ? null : (
+		<Marker position={coords}>
+			<Popup>Location</Popup>
+		</Marker>
+	);
 }
 
 export default function LeafletMap({coords,children}) {
 	return (
-		<div className="leaflet-map">
+		<>
 			<MapContainer
-				style={{ height: 450, width: 600 }}
+				style={{ height: 450, width: 450 }}
 				center={[0, 0]}
 				zoom={8}
 				scrollWheelZoom={false}
@@ -34,6 +39,6 @@ export default function LeafletMap({coords,children}) {
 				/>
 				{children}
 			</MapContainer>
-		</div>
+		</>
 	);
 }

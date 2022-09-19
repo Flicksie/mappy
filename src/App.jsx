@@ -17,7 +17,7 @@ import { FormHelperText } from "@mui/material";
 import { useContext } from "react";
 import { HistoryContext } from "./contexts/History"
 import HistoryContextProvider from './contexts/History';
-import LeafletMap, { FlyToLocation } from "./components/Map";
+import LeafletMap, { FlyToLocation, PanToLocation } from "./components/Map";
 import InfoBox from "./components/InfoBox";
 
 import {Grid,Item} from '@mui/material';
@@ -28,11 +28,12 @@ import HistoryList from "./components/History/HistoryList";
 
 
 function App() {
-  const [current, setCurrent] = useState(null);
   const [search, setSearch] = useState("");
-  const [coords,setCoords] = useState([0,0]);
   const [err,setErr] = useState("");
-  const {history,setHistory} = useContext(HistoryContext);
+  const {
+    history,setHistory,
+    currentSelection,setCurrentSelection
+  } = useContext(HistoryContext);
   
 
   const handleSearchInput = (ev)=>{
@@ -46,31 +47,31 @@ function App() {
       }
       setErr("");
 
-      const coordinates = [response.data.latitude,response.data.longitude];
+      const coordinates = [response.data.latitude || 0,response.data.longitude|| 0];
 
       const newHistory = history;
-      newHistory.unshift({ ip:search, coords: coordinates, data: response.data });
+      const newEntry = { ip:search, coords: coordinates, data: response.data };
+      newHistory.unshift(newEntry);
       setHistory(newHistory);
-      setCurrent(response.data);
-      setCoords(coordinates);      
+
+      setCurrentSelection(newEntry);  
     })
   }
 
 
   return (
     <div className="app-container">
-      <div className="sidebar">
-        <HistoryList></HistoryList>
+      <div className="sidebar">        
+          <HistoryList></HistoryList>        
       </div>
 
-      <HistoryContextProvider>
 
         <div className="map-area">
           <div className="map-and-info current">
             <LeafletMap>
-              <FlyToLocation coords={ coords || [1, 1]} />
+              <FlyToLocation coords={ currentSelection?.coords || [1, 1]} />
             </LeafletMap>
-            <InfoBox {...{current}} />
+            <InfoBox current={currentSelection.data} />
           </div>
           
           <div className="searchbar">          
@@ -102,13 +103,12 @@ function App() {
 
           <div className="map-and-info last">
             <LeafletMap>
-              <FlyToLocation coords={history[1]?.coords || [1, 1]} />
+              <PanToLocation coords={history[1]?.coords || [1, 1]} />
             </LeafletMap>
             <InfoBox current={history[1]?.data} />
           </div>
         </div>
 
-      </HistoryContextProvider>
         
 
 
@@ -117,6 +117,7 @@ function App() {
       
 
     </div>
+      
   );
 }
 

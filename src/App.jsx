@@ -1,51 +1,42 @@
 import "./App.css";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useContext } from "react";
+import { HistoryContext } from "./contexts/History"
 import getIpData from "./api/communicator";
+import axios from "axios";
 
-
-
-
-
-import Box from "@mui/material/Box";
-import IconButton from "@mui/material/IconButton";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import InputLabel from "@mui/material/InputLabel";
-import InputAdornment from "@mui/material/InputAdornment";
+import { FormHelperText, IconButton, OutlinedInput, InputLabel, InputAdornment } from "@mui/material";
 import TextField from "@mui/material/FormControl";
 import Search from "@mui/icons-material/Search";
-import { FormHelperText } from "@mui/material";
-import { useContext } from "react";
-import { HistoryContext } from "./contexts/History"
-import HistoryContextProvider from './contexts/History';
+
 import LeafletMap, { FlyToLocation, PanToLocation } from "./components/Map";
+
 import InfoBox from "./components/InfoBox";
-
-import {Grid,Item} from '@mui/material';
-import { Container } from "@mui/system";
 import HistoryList from "./components/History/HistoryList";
-
 
 
 
 function App() {
   const [search, setSearch] = useState("");
+  const [clientIP, setClientIP] = useState("");
   const [err,setErr] = useState("");
   const {
     history,setHistory,
     currentSelection,setCurrentSelection
   } = useContext(HistoryContext);
-  
+
 
   const handleSearchInput = (ev)=>{
     setSearch(ev.target.value);
   }
 
-  const handleSearch = (ev)=>{
+  const handleSearch = ()=> {
     getIpData(search).then((response) => {
+      // error display
       if (response.status === 'Error'){
         return setErr(response.msg);
       }
       setErr("");
+      //---
 
       const coordinates = [response.data.latitude || 0,response.data.longitude|| 0];
 
@@ -58,6 +49,29 @@ function App() {
     })
   }
 
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      return handleSearch(e);
+    }
+  }
+
+
+  
+  // Initial client IP fetch
+  useEffect( () => {
+    axios.get('https://geolocation-db.com/json/').then(res=>{
+      setClientIP(res.data.IPv4);
+      setSearch(res.data.IPv4);
+    });
+    
+  }, []);
+
+  // Execute a search on client IP fetch
+  useEffect( () => {
+    if (search.length) handleSearch();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clientIP])
+
 
   return (
     <div className="app-container">
@@ -68,7 +82,7 @@ function App() {
 
         <div className="map-area">
           <div className="map-and-info current">
-            <LeafletMap>
+            <LeafletMap>              
               <FlyToLocation coords={ currentSelection?.coords || [1, 1]} />
             </LeafletMap>
             <InfoBox current={currentSelection.data} />
@@ -84,7 +98,8 @@ function App() {
                     id="outlined-adornment-helper-text"
                     type="text"
                     error={!!err.length}
-                    
+                    value={search}
+                    onKeyDown={handleKeyDown}
                     placeholder="192.168.1.128"
                     onChange= {handleSearchInput}
                     endAdornment={
@@ -107,14 +122,7 @@ function App() {
             </LeafletMap>
             <InfoBox current={history[1]?.data} />
           </div>
-        </div>
-
-        
-
-
-      
-      
-      
+        </div>     
 
     </div>
       

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { MapContainer, TileLayer, useMap, Marker, Popup } from "react-leaflet";
 
 function ReturnMarker(c, text) {
@@ -6,6 +7,18 @@ function ReturnMarker(c, text) {
 			<Popup> {text || "Location"} </Popup>
 		</Marker>
 	);
+}
+export function MapLocator(){
+	const map = useMap();
+  
+	useEffect(()=>{      
+	  map.locate({setView: true, watch: true, maxZoom: 17});
+	  map.once('locationfound', (ev) => {
+		map.flyTo(ev.latlng, map.getZoom());
+		return ReturnMarker(ev.latlng);
+	  });
+	}); 
+	
 }
 
 export function FlyToLocation({ coords }) {
@@ -20,10 +33,11 @@ export function PanToLocation({ coords }) {
 }
 
 export default function LeafletMap({coords,children}) {
+
 	return (
 		<div className="leaflet-map">
 			<MapContainer
-				style={{ height: 450, width: 600 }}
+				style={{ height: 400, width: 600 }}
 				center={[0, 0]}
 				zoom={8}
 				scrollWheelZoom={false}

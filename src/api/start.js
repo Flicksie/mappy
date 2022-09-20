@@ -19,9 +19,7 @@ app.get('/api/getipinfo/:ipv4', async (req,res,nex) => {
     if ( !ipv4.match(IP_VALIDATION_RGX) )
         return res.status(400).json({ status: "Error", msg: "Invalid IP address (must be ipv4)"});
 
-    //const {status,data} = await axios.get( `${BASE_URL}/${ipv4}?access_key=${ACCESS_KEY}`);
-    const status = 200;
-    const data = ipstack.mockdata;
+    const {status,data} = await axios.get( `${BASE_URL}/${ipv4}?access_key=${ACCESS_KEY}`);
     
     if (status !== 200) 
         return res.status(504).json({ status: "Error", msg: `Received error ${status} from API`});

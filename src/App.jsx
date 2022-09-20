@@ -83,7 +83,10 @@ function App() {
         <div className="map-area">
           <div className="map-and-info current">
             <LeafletMap>              
-              <FlyToLocation coords={ currentSelection?.coords || [1, 1]} />
+              <FlyToLocation 
+                coords={ currentSelection?.coords || [1, 1]} 
+                title={currentSelection?.data?.city || "N/A"} 
+              />
             </LeafletMap>
             <InfoBox current={currentSelection.data} />
           </div>
@@ -118,7 +121,10 @@ function App() {
 
           <div className="map-and-info last">
             <LeafletMap>
-              <PanToLocation coords={history[1]?.coords || [1, 1]} />
+              <PanToLocation
+                coords={history[1]?.coords || [1, 1]} 
+                title={history[1]?.data?.city || "N/A"} 
+              />
             </LeafletMap>
             <InfoBox current={history[1]?.data} />
           </div>

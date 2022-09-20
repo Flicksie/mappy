@@ -21,15 +21,15 @@ export function MapLocator(){
 	
 }
 
-export function FlyToLocation({ coords }) {
+export function FlyToLocation({ coords, title }) {
 	const map = useMap();
 	map.flyTo(coords, map.getZoom());
-	return ReturnMarker(coords);
+	return ReturnMarker(coords, title);
 }
-export function PanToLocation({ coords }) {
+export function PanToLocation({ coords, title }) {
 	const map = useMap();
 	map.panTo(coords, map.getZoom());
-	return ReturnMarker(coords);
+	return ReturnMarker(coords, title);
 }
 
 export default function LeafletMap({coords,children}) {
